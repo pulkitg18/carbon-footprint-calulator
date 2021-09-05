@@ -36,8 +36,6 @@ const MCQs = ({ navigation, screen }) => {
     navigation.push(screen.goTo);
   };
 
-  console.log(currentClicked);
-
   return (
     <ScrollView>
       <View style={styles.container}>

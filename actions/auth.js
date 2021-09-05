@@ -1,16 +1,22 @@
+import API from "../api/axios";
 import { auth } from "../lib/firebase";
 
-export const signin = async (formData, loading) => {
-  console.log("i was called ");
-
+export const signin = async (formData, setLoading, setUser) => {
   try {
     await auth.createUserWithEmailAndPassword(formData.email, formData.pass);
-    console.log("====================================");
-    console.log("created ");
-    console.log("====================================");
+    await API.post("/user", {
+      name: formData.name,
+      email: formData.email.toLowerCase(),
+    });
+    setUser({
+      name: formData.name,
+      email: formData.email.toLowerCase(),
+      score: 0,
+    });
+    setLoading(false);
+    return;
   } catch (error) {
-    console.log("====================================");
-    console.log(error);
-    console.log("====================================");
+    setLoading(false);
+    return error;
   }
 };

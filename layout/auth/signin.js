@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Dimensions,
   Image,
@@ -9,13 +9,95 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Input } from "react-native-elements";
-import { signin } from "../../actions/auth";
 import { ScrollView } from "react-native";
+import Spinner from "react-native-loading-spinner-overlay";
+import { signin } from "../../actions/auth";
+import useAppContext from "../../context/app";
 
 const Signin = ({ navigation }) => {
-  const signupUser = () => {
-    // signin({ email: "gpulkit712@gmail.com", pass: "pulkit" });
-    navigation.push("Calcuate1");
+  const form = [
+    {
+      placeholder: "Name",
+      iconName: "user",
+      keyboardType: "default",
+      secureTextEntry: false,
+      key: "name",
+    },
+    {
+      placeholder: "Email",
+      iconName: "user",
+      keyboardType: "email-address",
+      secureTextEntry: false,
+      key: "email",
+    },
+
+    {
+      placeholder: "Password",
+      iconName: "lock",
+      keyboardType: "visible-password",
+      secureTextEntry: true,
+      key: "pass",
+    },
+    {
+      placeholder: "Confirm password",
+      iconName: "lock",
+      keyboardType: "default",
+      secureTextEntry: true,
+      key: "confirmPass",
+    },
+  ];
+
+  const initalFormData = { email: "", name: "", pass: "", confirmPass: "" };
+  const [formData, setFormData] = useState(initalFormData);
+
+  const initialError = { state: false, key: "", message: "" };
+  const [error, setError] = useState(initialError);
+
+  const { setUserDetails } = useAppContext();
+
+  const [loading, setLoading] = useState(false);
+
+  const figureErrors = () => {
+    if (formData.pass !== formData.confirmPass) {
+      setError({
+        state: true,
+        key: "confirmPass",
+        message: "Passwords do not match",
+      });
+
+      return false;
+    }
+
+    setError(initialError);
+    return true;
+  };
+
+  const disabled =
+    !formData.email ||
+    !formData.pass ||
+    !formData.confirmPass ||
+    !formData.name;
+
+  const signupUser = async () => {
+    const success = figureErrors();
+    if (success) {
+      setLoading(true);
+
+      const res = await signin(formData, setLoading, setUserDetails);
+      if (res?.message?.includes("email")) {
+        setError({
+          state: true,
+          key: "email",
+          message: res.message,
+        });
+      } else {
+        setError({
+          state: true,
+          key: "confirmPass",
+          message: res.message,
+        });
+      }
+    }
   };
 
   return (
@@ -28,39 +110,52 @@ const Signin = ({ navigation }) => {
         </Text>
 
         <View style={styles.inputs}>
-          <Input
-            style={styles.input}
-            placeholder="Email"
-            leftIcon={<Icon name="user" size={24} color="black" />}
-            keyboardType="email-address"
-            type="email"
-          />
+          {form.map((data, i) => (
+            <Input
+              key={i}
+              placeholder={data.placeholder}
+              leftIcon={<Icon name={data.iconName} size={24} color="black" />}
+              keyboardType={data.keyboardType}
+              secureTextEntry={data.secureTextEntry}
+              errorMessage={error.key === data.key ? error.message : ""}
+              value={formData[data.key]}
+              onChangeText={(text) => {
+                setFormData({ ...formData, [data.key]: text });
+              }}
+            />
+          ))}
+          {/* <View
+            style={{ width: "100%", paddingHorizontal: 10 }}
+            onPress={showMenu}
+          >
+            <Menu
+              visible={visible}
+              anchor={
+                <Pressable style={styles.menu}>
+                  <Text style={{ fontSize: 18, opacity: 0.5 }}>Show menu</Text>
+                </Pressable>
+              }
+              onRequestClose={hideMenu}
+            >
+              <MenuItem onPress={hideMenu}>Menu item 1</MenuItem>
+              <MenuItem onPress={hideMenu}>Menu item 2</MenuItem>
+              <MenuItem disabled>Disabled item</MenuItem>
+              <MenuItem onPress={hideMenu}>Menu item 4</MenuItem>
+            </Menu>
+          </View> */}
 
-          <Input
-            style={styles.input}
-            placeholder="Username"
-            leftIcon={<Icon name="user" size={24} color="black" />}
-          />
-
-          <Input
-            style={styles.input}
-            placeholder="Password"
-            secureTextEntry={true}
-            type="password"
-            keyboardType="visible-password"
-            leftIcon={<Icon name="lock" size={24} color="black" />}
-          />
-
-          <Input
-            style={styles.input}
-            placeholder="Confirm password"
-            leftIcon={<Icon name="lock" size={24} color="black" />}
-            secureTextEntry
-          />
-
-          <Pressable onPress={signupUser} style={styles.button}>
+          <Pressable
+            disabled={disabled}
+            onPress={signupUser}
+            style={[styles.button, { opacity: disabled ? 0.6 : 1 }]}
+          >
             <Text style={styles.buttonText}>Sign up</Text>
           </Pressable>
+          <Spinner
+            visible={loading}
+            textContent={"Loading..."}
+            textStyle={{ color: "#fff", fontWeight: "400" }}
+          />
 
           <View style={styles.or}>
             <View style={styles.line} />
@@ -93,6 +188,14 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
+  },
+
+  menu: {
+    width: "100%",
+    borderBottomColor: "rgba(0,0,0,0.5)",
+    borderBottomWidth: 1,
+    paddingBottom: 10,
+    marginTop: 5,
   },
   logo: {
     fontSize: 25,

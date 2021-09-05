@@ -6,7 +6,6 @@ import {
   StyleSheet,
   Text,
   View,
-  ScrollView,
 } from "react-native";
 import Slider from "@react-native-community/slider";
 import useScoreContext from "../../context/score";
@@ -20,7 +19,7 @@ const CalculateSlider = ({ navigation, screen }) => {
 
     setSliderScore(score);
 
-    navigation.push("Dashboard");
+    navigation.push("Number");
   };
 
   return (

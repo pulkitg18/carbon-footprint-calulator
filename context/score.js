@@ -16,6 +16,7 @@ export const ScoreContextProvider = ({ children }) => {
   });
 
   const [sliderScore, setSliderScore] = useState(0);
+  const [numberScore, setNumberScore] = useState(0);
 
   const value = {
     totalScore,
@@ -24,6 +25,8 @@ export const ScoreContextProvider = ({ children }) => {
     setScreenScore,
     sliderScore,
     setSliderScore,
+    numberScore,
+    setNumberScore,
   };
 
   return (

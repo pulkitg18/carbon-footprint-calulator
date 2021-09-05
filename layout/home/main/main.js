@@ -33,12 +33,20 @@ export default function Main({ navigation }) {
             <View style={styles.dot} />
           </View>
 
-          <Pressable
-            onPress={() => navigation.push("Auth")}
-            style={styles.button}
-          >
-            <Text style={styles.buttonText}>Get started</Text>
-          </Pressable>
+          <View>
+            <Pressable
+              onPress={() => navigation.push("Auth")}
+              style={styles.button}
+            >
+              <Text style={styles.buttonText}>Get started</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => navigation.push("Auth")}
+              style={[styles.button, { marginTop: 20 }]}
+            >
+              <Text style={styles.buttonText}>Sign in instead</Text>
+            </Pressable>
+          </View>
         </View>
       </View>
     </View>

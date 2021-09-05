@@ -1,12 +1,6 @@
 import caluclate from "../json/calculation";
 
-export const calculateMCQ = (
-  type,
-  option,
-  setScore,
-  totalScore,
-  screenScore
-) => {
+export const calculateMCQ = (type, option, setScore, screenScore) => {
   if (type === "Transport") return;
 
   const score = caluclate.mcq[type][option].score;
